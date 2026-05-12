@@ -23,7 +23,7 @@ COPY app/        app/
 COPY database/   database/
 COPY resources/  resources/
 COPY routes/     routes/
-COPY .env        .env
+
 
 # Step 3: Re-install with our composer.json
 COPY composer.json composer.json
@@ -32,6 +32,7 @@ RUN composer install --optimize-autoloader --no-dev
 # Step 4: Generate app key
 RUN php artisan key:generate --force
 
+RUN php artisan config:clear
 # Set permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
