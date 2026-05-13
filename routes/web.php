@@ -35,15 +35,4 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-// TEMPORARY DEBUG - remove after fixing
-Route::get('/debug-auth', function() {
-    $user = \App\Models\User::where('email', 'admin@jobyaari.com')->first();
-    return response()->json([
-        'user_exists' => !!$user,
-        'email' => $user?->email,
-        'password_set' => !empty($user?->password),
-        'can_login' => $user ? \Illuminate\Support\Facades\Hash::check('password', $user->password) : false,
-        'session_driver' => config('session.driver'),
-        'session_id' => session()->getId(),
-    ]);
-});
+
