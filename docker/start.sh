@@ -94,38 +94,25 @@ php artisan storage:link --force 2>/dev/null || true
 # Create required directories
 mkdir -p /var/www/storage/framework/sessions
 mkdir -p /var/www/storage/framework/views
-mkdir -p /var/www/storage/framework/cache
+mkdir -p /var/www/storage/framework/cache/data
 mkdir -p /var/www/storage/logs
 mkdir -p /var/www/bootstrap/cache
 
 # Fix permissions
-# Fix permissions
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Start PHP-FPM in foreground first to verify it works
-php-fpm --test
-
-# Start PHP-FPM as daemon
-php-fpm -D
-
-# Wait for php-fpm to be ready
-sleep 2
-
-# Verify php-fpm is running
-if ! pgrep -x "php-fpm" > /dev/null; then
-    echo "ERROR: php-fpm failed to start"
-    exit 1
-fi
-
-echo "PHP-FPM is running"
+# Clear and rebuild cache
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
 
 # Inject PORT into nginx config
 sed -i "s/\$PORT/$PORT/g" /etc/nginx/sites-available/default 2>/dev/null || true
 sed -i "s/\$PORT/$PORT/g" /etc/nginx/sites-enabled/default 2>/dev/null || true
 
-# Test nginx config
-nginx -t
+# Start PHP-FPM in background
+php-fpm -D
 
 echo "App is live on port $PORT"
 
