@@ -46,3 +46,29 @@ class AuthController extends Controller
         return view('admin.dashboard', compact('stats'));
     }
 }
+
+public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required',
+    ]);
+
+    \Log::info('Login attempt', ['email' => $credentials['email']]);
+    \Log::info('Auth check before', ['auth' => Auth::check()]);
+
+    if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        \Log::info('Auth attempt succeeded');
+        \Log::info('Auth check after', ['auth' => Auth::check()]);
+        
+        $request->session()->regenerate();
+        
+        \Log::info('Session id', ['id' => $request->session()->getId()]);
+        \Log::info('Redirecting to', ['url' => route('admin.dashboard')]);
+        
+        return redirect()->route('admin.dashboard');
+    }
+
+    \Log::info('Auth attempt FAILED');
+    return back()->withErrors(['email' => 'Invalid credentials.'])->onlyInput('email');
+}
