@@ -11,10 +11,6 @@ Route::get('/', [BlogController::class, 'index'])->name('home');
 Route::get('/blogs', [BlogController::class, 'index'])->name('blogs.index');
 Route::get('/blogs/{slug}', [BlogController::class, 'show'])->name('blogs.show');
 
-Route::get('/login', function () {
-    return redirect()->route('admin.login');
-})->name('login');
-
 // Admin Auth Routes
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
