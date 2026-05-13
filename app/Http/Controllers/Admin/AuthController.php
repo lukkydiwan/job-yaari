@@ -22,15 +22,7 @@ class AuthController extends Controller
 
     if (Auth::attempt($credentials, $request->boolean('remember'))) {
         $request->session()->regenerate();
-        
-        // Return JSON for AJAX or use meta redirect to avoid proxy cookie stripping
-        if ($request->ajax()) {
-            return response()->json(['redirect' => route('admin.dashboard')]);
-        }
-        
-        return response()->view('admin.auth.redirecting', [
-            'url' => route('admin.dashboard')
-        ]);
+        return redirect()->intended(route('admin.dashboard'));
     }
 
     return back()->withErrors(['email' => 'Invalid credentials.'])->onlyInput('email');
