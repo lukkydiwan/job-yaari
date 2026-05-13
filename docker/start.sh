@@ -85,29 +85,30 @@ if [ "$USER_COUNT" = "0" ]; then
   echo "Fresh database, seeding..."
   php artisan db:seed --force
 else
-  echo "Database already seeded ($USER_COUNT users found), skipping."
+  echo "Already seeded ($USER_COUNT users), skipping."
 fi
 
-# Storage symlink
+# Fix storage
 php artisan storage:link --force 2>/dev/null || true
 
-# Cache config and routes for performance
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+# Create required directories
+mkdir -p /var/www/storage/framework/sessions
+mkdir -p /var/www/storage/framework/views
+mkdir -p /var/www/storage/framework/cache
+mkdir -p /var/www/storage/logs
+mkdir -p /var/www/bootstrap/cache
 
 # Fix permissions
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Start PHP-FPM in background
-php-fpm -D
+# Clear all caches first then rebuild
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan cache:clear
 
-echo "App is live!"
-
-# Inject Render's PORT into nginx config
-sed -i "s/\\\$PORT/$PORT/g" /etc/nginx/sites-available/default 2>/dev/null || true
-sed -i "s/\\\$PORT/$PORT/g" /etc/nginx/sites-enabled/default 2>/dev/null || true
-
-
-# Start Nginx in foreground
-nginx -g "daemon off;"
+# Rebuild caches
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
