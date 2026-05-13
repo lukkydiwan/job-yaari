@@ -103,5 +103,10 @@ php-fpm -D
 
 echo "App is live!"
 
+# Inject Render's PORT into nginx config
+sed -i "s/\\\$PORT/$PORT/g" /etc/nginx/sites-available/default 2>/dev/null || true
+sed -i "s/\\\$PORT/$PORT/g" /etc/nginx/sites-enabled/default 2>/dev/null || true
+
+
 # Start Nginx in foreground
 nginx -g "daemon off;"
