@@ -30,29 +30,3 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
     });
 });
-
-// TEMP DEBUG
-Route::get('/debug-session', function() {
-    return response()->json([
-        'session_id' => session()->getId(),
-        'auth_check' => auth()->check(),
-        'auth_user' => auth()->user()?->email,
-        'session_all' => session()->all(),
-        'is_https' => request()->isSecure(),
-        'forwarded_proto' => request()->header('X-Forwarded-Proto'),
-        'cookie_header' => request()->header('Cookie'),
-    ]);
-});
-
-Route::get('/debug-login', function() {
-    Auth::loginUsingId(1);
-    session(['test' => 'hello']);
-    session()->save();
-    return response()->json([
-        'logged_in' => auth()->check(),
-        'session_id' => session()->getId(),
-        'redirect_to' => route('admin.dashboard'),
-    ]);
-});
-
-
