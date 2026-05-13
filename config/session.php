@@ -72,7 +72,7 @@ return [
     |
     */
 
-    'connection' => env('DB_CONNECTION','mysql'),
+    'connection' => 'mysql',
 
     /*
     |--------------------------------------------------------------------------
@@ -168,7 +168,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE',false),
+    'secure' => false,
 
     /*
     |--------------------------------------------------------------------------

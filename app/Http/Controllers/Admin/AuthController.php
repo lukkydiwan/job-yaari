@@ -14,19 +14,27 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
-        ]);
+{
+    $credentials = $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required',
+    ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $request->session()->regenerate();
-            return redirect()->route('admin.dashboard');
+    if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $request->session()->regenerate();
+        
+        // Return JSON for AJAX or use meta redirect to avoid proxy cookie stripping
+        if ($request->ajax()) {
+            return response()->json(['redirect' => route('admin.dashboard')]);
         }
-
-        return back()->withErrors(['email' => 'Invalid credentials.'])->onlyInput('email');
+        
+        return response()->view('admin.auth.redirecting', [
+            'url' => route('admin.dashboard')
+        ]);
     }
+
+    return back()->withErrors(['email' => 'Invalid credentials.'])->onlyInput('email');
+}
 
     public function logout(Request $request)
     {
